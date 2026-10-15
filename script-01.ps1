@@ -27,45 +27,49 @@ Clear-Host
 #? ###########################################################################################
 [boolean]$isRunning = $true
 [boolean]$script:game = $false
-[int]$script:try = 0
-[int]$number = Get-Random -Maximum 100
+[int]$script:try
+[int]$script:maxTry
+[int]$script:maxNumber
 [string]$welcome = "###############################################`n##        Welcome to the Clock Game!         ##`n###############################################"
 [string]$mainMenuStr = "################## Main Menu ##################`n[1] New Game`n[2] Score Board`n[3] User Score`n[4] Rules`n[0] Quit"
 [string]$exitStr = "###############################################`n##        Do you really want to quit ?       ##`n###############################################"
+[string]$levelStr = "###############################################`n##              Level Selector               ##`n###############################################"
 [string]$csvPath = "C:\Users\Carla\Documents\PowerShell\data\scores.csv"
 [string]$nickname = ""
 $script:notes = @("SS", "S", "A", "B", "C", "D")
 
+
+
 #? ###########################################################################################
 #? ################################        Class         #####################################
 #? ###########################################################################################
-class GameData{
-    [string]$dataNickname
-    [string]$dataDate
-    [string]$dataDifficulty
-    [string]$dataResultat
-    [int]$dataTry
-    [int]$dataScore
-    [int]$dataSecretNmb
+# class GameData{
+#     [string]$dataNickname
+#     [string]$dataDate
+#     [string]$dataDifficulty
+#     [string]$dataResultat
+#     [int]$dataTry
+#     [int]$dataScore
+#     [int]$dataSecretNmb
 
-    GameData(
-    [string]$dataNickname,
-    [string]$dataDate,
-    [string]$dataDifficulty,
-    [string]$dataResultat,
-    [int]$dataTry,
-    [int]$dataScore,
-    [int]$dataSecretNmb
-    ) {
-    $this.dataNickname = $dataNickname
-    $this.dataDate = $dataDate
-    $this.dataDifficulty = $dataDifficulty
-    $this.dataResultat = $dataResultat
-    $this.dataTry = $dataTry
-    $this.dataScore = $dataScore
-    $this.dataSecretNmb = $dataSecretNmb
-    }
-}
+#     GameData(
+#     [string]$dataNickname,
+#     [string]$dataDate,
+#     [string]$dataDifficulty,
+#     [string]$dataResultat,
+#     [int]$dataTry,
+#     [int]$dataScore,
+#     [int]$dataSecretNmb
+#     ) {
+#     $this.dataNickname = $dataNickname
+#     $this.dataDate = $dataDate
+#     $this.dataDifficulty = $dataDifficulty
+#     $this.dataResultat = $dataResultat
+#     $this.dataTry = $dataTry
+#     $this.dataScore = $dataScore
+#     $this.dataSecretNmb = $dataSecretNmb
+#     }
+# }
 
 #? ###########################################################################################
 #? ###############################        Banner         #####################################
@@ -74,30 +78,62 @@ function gameBanner() {
     Clear-Host
     $welcome | Write-Host -ForegroundColor Magenta
 }
+
 function userBanner($name) {
+    Clear-Host
     Write-Host "###############################################" -ForegroundColor Blue
     Write-Host "PowerShell?, Let's go !" $name -ForegroundColor Blue
     Write-Host "###############################################" -ForegroundColor Blue
 }
 
 #? ###########################################################################################
-#? #############################        Main Menu         ####################################
+#? #############################        Main Menu         ####################################enterNmb
 #? ###########################################################################################
 function mainMenu(){
     gameBanner
     $mainMenuStr | Write-Host -ForegroundColor DarkGreen
-    $mainMenuAction = Read-Host "Enter your action"
+    
+    
+    try {
+        [int]$mainMenuAction = Read-Host "Enter your action"
 
     switch ($mainMenuAction) {
-        1 { gameStart }
+        1 { levelMenu }
         2 {  }
         3 {  }
         4 { rulesMenu }
         0 { exitGame }
         Default {}
     }
+    } catch {
+        Write-Host "Error"
+    }
 
 }
+
+#? ###########################################################################################
+#? #############################        Level Menu         ###################################
+#? ###########################################################################################
+
+function levelMenu () {
+    Clear-Host
+    $levelStr | Write-Host -ForegroundColor Green
+    Write-Host "[1] Easy" -ForegroundColor DarkGreen
+    Write-Host "[2] Medium" -ForegroundColor DarkBlue
+    Write-Host "[3] Hard" -ForegroundColor DarkRed
+    $levelInput = Read-Host "Action"
+    levelSelector($levelInput)
+}
+
+function levelSelector($inputLevel) {
+    switch ($inputLevel) {
+        1 { game 50 10 }
+        2 { game 100 7 }
+        3 { game 500 8 }
+        Default {}
+    }
+}
+
 
 #? ###########################################################################################
 #? ################################        Rules         #####################################
@@ -115,8 +151,8 @@ function rulesMenu() {
 
 function gameStart() {
     Clear-Host
-
     $script:game = $true
+    
 }
 
 #? ###########################################################################################
@@ -127,16 +163,18 @@ function bye() {
     exit 1
 } 
 function exitGame() {
-    Clear-Host
-    $exitStr | Write-Host -ForegroundColor Red
-    Write-Host "[1] Back to main menu" -ForegroundColor Green
-    Write-Host "[2] Let me leave" -ForegroundColor DarkRed
-    $action = Read-Host "Action"
+    while ($true) {
+        Clear-Host
+        $exitStr | Write-Host -ForegroundColor Red
+        Write-Host "[1] Back to main menu" -ForegroundColor Green
+        Write-Host "[2] Let me leave" -ForegroundColor DarkRed
+        $action = Read-Host "Action"
 
     switch ($action) {
         1 { mainMenu }
         2 { bye }
-        Default {}
+    Default {}
+    }
     }
     
 }
@@ -145,74 +183,99 @@ function exitGame() {
 #? #############################        Formalizer         ###################################
 #? ###########################################################################################
 function textFormalizer($text) {
-    $text.replace(' ', '')
+    $text = $text.replace(' ', '')
     $textInfo = (Get-Culture).TextInfo
-    $textInfo.ToTitleCase($text)
+    $text = $textInfo.ToTitleCase($text.ToLower())
     return $text
 }
 
 #? ###########################################################################################
+#? ###########################        OLD note calculator         ############################
 #? ###########################################################################################
-function calculNote([float]$currNote) {
-    #* Write-Host $currNote
-        switch ($currNote) {
-            {$_ -ge 85} { $note = $script:notes[0] }
-            {$_ -ge 70} { $note = $script:notes[1] }
-            {$_ -ge 50} { $note = $script:notes[2] }
-            {$_ -ge 40} { $note = $script:notes[3] }
-            {$_ -ge 20} { $note = $script:notes[4] }
-            {$_ -lt 20} { $note = $script:notes[5] }
-            Default { $note = "test"}
-        }
-    return $note
-}
+# function calculNote([float]$currNote) {
+#     #* Write-Host $currNote
+#         switch ($currNote) {
+#             {$_ -ge 85} { $note = $script:notes[0] }
+#             {$_ -ge 70} { $note = $script:notes[1] }
+#             {$_ -ge 50} { $note = $script:notes[2] }
+#             {$_ -ge 40} { $note = $script:notes[3] }
+#             {$_ -ge 20} { $note = $script:notes[4] }
+#             {$_ -lt 20} { $note = $script:notes[5] }
+#             Default { $note = "test"}
+#         }
+#     return $note
+# }
+#? ###########################################################################################
+#? ###########################################################################################
 
-function gameWon($name, $score, $try, $nmb) {
-    Clear-Host
-    $note = calculNote($score)
-    Write-Host "#######################################################################" -ForegroundColor DarkCyan
-    Write-Host ""
-    Write-Host $nickname "You won! with"$try"try, the number is" $number". Accuracy:" ("{0:N2}" -f ($finalScore))"%" -ForegroundColor Magenta
-    Write-Host "Your note:" $note -ForegroundColor Magenta
-    Write-Host ""
-    Write-Host "#######################################################################" -ForegroundColor DarkCyan
+function gameResult($score, $maxNmb, $result) {
     
+    if ($result -eq "W") {
+        Clear-Host
+        Write-Host "#######################################################################" -ForegroundColor DarkCyan
+        Write-Host ""
+        Write-Host $nickname "You won! with"$script:try "try remains, the number is" $number". Accuracy:" ("{0:N2}" -f ($finalScore))"%" -ForegroundColor Magenta
+        Write-Host "Your note:" "N/A" -ForegroundColor Magenta
+        Write-Host ""
+        Write-Host "#######################################################################" -ForegroundColor DarkCyan
+        # $note = calculNote($score)
+        saveGame
+        
+    } else {
+        Write-Host "#######################################################################" -ForegroundColor DarkCyan
+        Write-Host ""
+        Write-Host $nickname "You lose! with"$script:try "try remains, the number is" $number". Accuracy:" ("{0:N2}" -f ($finalScore))"%" -ForegroundColor Magenta
+        Write-Host "Your note:" "N/A" -ForegroundColor Magenta
+        Write-Host ""
+        Write-Host "#######################################################################" -ForegroundColor DarkCyan
+        saveGame
+    }
+}
+
+function saveGame() {
     $date = Get-Date
-
-    $userSave = [GameData]::new($nickname, $date, "", "", $try, ("{0:N2}" -f ($finalScore)), $nmb)
-
-    $userSave.dataUsername | Write-Host
-
-    $script:game = $false
-}
-function enterNmb ($numberInput) {
-    Clear-Host
-    userBanner($nickname)
-    $script:try += 1
-    if ($numberInput -lt $number){
-        Write-Host "Try:" $try "Le chiffre est plus grand"-ForegroundColor Red
-    }  
-    if ($numberInput -gt $number) {
-        Write-Host "Try:" $try "Le chiffre est plus petit"  -ForegroundColor Yellow
-    }
-    if ($numberInput -eq $number) {
-        [float]$finalScore = 100/$try
-        gameWon($nickname, $finalScore, $try, $number)
-    }
+        
+        $userSave = [GameData]::new($nickname, $date, "", "", $try, ("{0:N2}" -f ($finalScore)), $nmb)
+        $userSave
+        
+        $script:game = $false
 }
 
-mainMenu
 
-while ($isRunning) {
-    while ($script:game) {
+
+function enterNmb ($numberInput, $nmb) {
+    userBanner $nickname
+    $script:try --
+    if ($numberInput -lt $nmb){
+        Write-Host "Try:" $script:try "Le chiffre est plus grand" -ForegroundColor Red
+    }  elseif ($numberInput -gt $nmb) {
+        Write-Host "Try:" $script:try "Le chiffre est plus petit"  -ForegroundColor Yellow
+    } elseif ($numberInput -eq $nmb) {
+        [float]$finalScore = 100/$script:try
+        gameResult $finalScore $nmb "W"
+    }
+
+    if ($script:try -eq 0) {
+        gameResult $finalScore $nmb "L"
+    }
+}
+
+
+function game($nmb, $try) {
+    gameStart
+    $number = Get-Random -Maximum $nmb
+    $script:try = $try
+    while ($script:try -gt 0) {
         if (-not $nickname) {
-            $usernameInput = Read-Host "Enter your username"
+            gameBanner
+            [string]$usernameInput = Read-Host "Enter your username"
             $nickname = textFormalizer($usernameInput)
+            userBanner $nickname
         } else {
             try {
-                [int]$response = Read-Host "Enter a nummber between 1 to 100"
-                if($response -le 100 -and $response -ge 0) {
-                    enterNmb($response)
+                [int]$response = Read-Host "Enter a nummber between 1 to" $nmb
+                if($response -le $nmb -and $response -ge 0) {
+                    enterNmb $response $number
                 } else {
                     Write-Host "Error number need to be between 1 to 100"
                 }
@@ -221,4 +284,8 @@ while ($isRunning) {
             }
         }
     }
+}
+
+while ($isRunning) {
+    mainMenu
 }

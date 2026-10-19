@@ -1,0 +1,4 @@
+"Name","min", "max", "tries" 
+"Easy", 0, 50, 10
+"Medium", 0, 100, 7
+"Hard", 0, 500, 8

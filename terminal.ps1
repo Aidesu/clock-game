@@ -9,7 +9,7 @@ function Start-Game {
 }
 
 function Show-Difficulty {
-    $difficulties = Import-Csv "$PSScriptRoot/data/difficulties.csv"   # -Delimiter ';' si besoin
+    $difficulties = Import-Csv "$PSScriptRoot/data/difficulties.csv"   # -Delimiter ;
 
     while ($true) {
         Write-Host "Select a difficulty level:"
@@ -45,12 +45,22 @@ function Start-GameWithDifficulty {
                 Write-Host "The number was $($game.secret)."
             }
             Save-Game -game $game -result $result
-            break
+            $choice = Read-Host "Do you want to restart?`n[1] Restart with same difficulty`n[2] Back to main menu"
+            switch ($choice) {
+                1 { Start-GameWithDifficulty -username $script:currAccount -difficulty $difficultyData.Name }
+                2 { return }
+                default { Write-Host "Invalid option. Please select a valid option." }
+            }
         }
     }
 }
 function Show-LoginRegister {
-    Write-Host "[1] Login, [2] Register"
+    Write-Host "---------------------------------------------"
+    if ($script:currAccount) {
+        Write-Host "Welcome back $($script:currAccount)"
+        Show-Difficulty
+    }   else {
+        Write-Host "[1] Login, [2] Register"
     $choice = Read-Host "Select an option"
 
     switch ($choice) {
@@ -84,19 +94,42 @@ function Show-LoginRegister {
             Write-Host "Invalid option. Please select a valid option."
         }
     }
+    }
+}
+
+function Show-Scoreboards {
+        
+    try {
+        Write-Host "[1] All [2] By users"
+        $choice = Read-Host "Select an option"
+        switch ($choice) {
+            1 { Read-AllScores }
+            2 {
+                $user = Read-Host "Select an user"
+                Read-Scores($user)
+            }
+            3 {  }
+            Default {Write-Host "Invalid option. Please select a valid option."}
+        }
+    }
+    catch {
+        Write-Host "NO"
+    }
 }
 
 Clear-Host
 Write-Host "Welcome to ClockGame"
 
 :mainLoop while ($true) {
+    Write-Host ""
+    Write-Host "---------------------------------------------"
     Write-Host "[1] Play, [2] Scoreboard, [3] Rules, [4] Exit"
     $choice = Read-Host "Select an option"
 
     switch ($choice) {
         1 { Show-LoginRegister }
-        2 { Write-Host "Scoreboard feature is not implemented yet." }
-        3 { Write-Host "Rules feature is not implemented yet." }
+        2 {  Show-Scoreboards }
+        3 { Get-Rules }
         4 {
             Write-Host "Exiting the game. Goodbye!"
             break mainLoop

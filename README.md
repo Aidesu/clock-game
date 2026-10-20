@@ -46,6 +46,7 @@ T12 — Plusieurs parties successives
 Historique ajouté, sans écrasement
  
 ### Enrichissements possibles
+
 Les fonctionnalités suivantes ne sont pas obligatoires. Elles permettront aux stagiaires les plus avancés d'approfondir le projet.
 ---
 1. Indices intelligents

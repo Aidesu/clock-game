@@ -1,5 +1,8 @@
 ## Powershell GUI avec VS Community
 ## Interface graphique réalisée avec Visual Studio Community
+Import-Module "$PSScriptRoot\core\Account.psm1" -Force
+$script:currAccount = $null
+
 $inputXML = @"
 <Window x:Class="MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -26,7 +29,7 @@ $inputXML = @"
             <TextBox x:Name="UsernameInput" Height="25" TextWrapping="Wrap" Text="" Width="180" FontFamily="Rockwell" VerticalContentAlignment="Center"/>
             <Label Content="Password" FontFamily="Rockwell"/>
             <PasswordBox x:Name="PasswordInput" Height="25" Width="180" Margin="0,0,0,10" FontFamily="Rockwell"/>
-            <Label x:Name="LoginMessage" Content="" Visibility="Collapsed"/>
+            <Label x:Name="LoginMessage" Content=""/>
             <Button x:Name="LoginBtn" Content="Login" Background="#FF93E2F1" Margin="0,0,0,5" Width="150" Height="25" FontFamily="Rockwell"/>
             <Button x:Name="RegisterBtn" Content="Register" Background="#FFEC9F51" Width="150" Height="25" FontFamily="Rockwell"/>
         </StackPanel>
@@ -141,6 +144,15 @@ $GUI_ExitBtn.Add_Click({ $Window.Close() })
 ##                     Account                       ##
 #######################################################
 
+$GUI_LoginBtn.Add_Click({
+    try {
+        $script:currAccount = Connect-User -username $GUI_UsernameInput.Text -password $GUI_PasswordInput.SecurePassword
+        Show-Page $GUI_DiffPage
+    }
+    catch {
+        $GUI_LoginMessage.Content = $_.Exception.Message
+    }
+})
 
 
 ## Affichage de la fenêtre

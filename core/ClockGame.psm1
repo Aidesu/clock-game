@@ -55,11 +55,16 @@ function Submit-Guess {
         $game,
         [int]$guess
     )
-    $game.attempts++
-    if ($guess -eq $game.secret) { return "Win" }
-    if ($game.attempts -ge $game.MaxTries) { return "Lose" }
-    if ($guess -lt $game.secret) { return "Too Low" }
-    else { return "Too High" }
+    if($guess -lt $game.min -or $guess -gt $game.max) {
+        return "Outside range"
+    } else {
+        $game.attempts++
+        if ($guess -eq $game.secret) { return "Win" }
+        if ($game.attempts -ge $game.MaxTries) { return "Lose" }
+        if ($guess -lt $game.secret) { return "Too Low" }
+        else { return "Too High" }
+    }
+    
 }
 
 function Start-ClockGame {

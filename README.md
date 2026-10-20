@@ -1,14 +1,15 @@
 ## Script
 
-### ASDevops - 2026-27
+## ASDevops - 2026-27
 Cahier des charges — Script PowerShell
 TP : Développement d'un jeu interactif « Devine le nombre »
 
 ### Recette et critères de validation
+---
 Le projet sera considéré comme fonctionnel si les scénarios de test suivants sont satisfaits.
 Grille de recette
 0/12 validés
----
+
 T01 — Lancement sur un système sans fichier de scores
 Menu affiché sans erreur
 

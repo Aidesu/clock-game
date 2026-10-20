@@ -47,7 +47,16 @@ function Read-AllScores {
     Import-Csv $savingPath | Sort-Object {[int]$_.Score} -Descending | Format-Table -Autosize
 }
 function Read-Scores ($username) {
-    Import-Csv $savingPath | Where-Object Username -eq $username | Sort-Object {[int]$_.Score} -Descending | Format-Table -Autosize
+    if (Import-Csv $savingPath | Where-Object Username -eq $username) {
+        try {
+            Import-Csv $savingPath | Where-Object Username -eq $username | Sort-Object {[int]$_.Score} -Descending | Format-Table -Autosize
+        }
+        catch {
+            return "Error"
+        }
+    } else {
+        return "User not found!"
+    }
 }
 
 function Submit-Guess {
@@ -83,6 +92,6 @@ function Start-ClockGame {
 }
 
 function Get-Rules {
-    $rules = "Lorem ipsum, dolor sit amet consectetur adipisicing elit.`nAb voluptate corporis temporibus molestiae.`nPorro delectus reiciendis, debitis incidunt tempora quidem quibusdam `nnesciunt exercitationem, nisi amet eligendi. `nExplicabo quaerat autem illo!"
+    $rules = "`nLorem ipsum, dolor sit amet consectetur adipisicing elit.`nAb voluptate corporis temporibus molestiae.`nPorro delectus reiciendis, debitis incidunt tempora quidem quibusdam `nnesciunt exercitationem, nisi amet eligendi. `nExplicabo quaerat autem illo!"
     return $rules
 }

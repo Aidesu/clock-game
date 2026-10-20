@@ -48,7 +48,7 @@ Historique ajouté, sans écrasement
 ### Enrichissements possibles
 
 Les fonctionnalités suivantes ne sont pas obligatoires. Elles permettront aux stagiaires les plus avancés d'approfondir le projet.
----
+
 1. Indices intelligents
 Après plusieurs tentatives infructueuses, proposer un indice : nombre pair ou impair, divisible par 5, ou distance approximative avec le nombre secret.
 Facile

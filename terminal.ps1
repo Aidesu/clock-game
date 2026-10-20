@@ -45,11 +45,13 @@ function Start-GameWithDifficulty {
                 Write-Host "The number was $($game.secret)."
             }
             Save-Game -game $game -result $result
-            $choice = Read-Host "Do you want to restart?`n[1] Restart with same difficulty`n[2] Back to main menu"
-            switch ($choice) {
-                1 { Start-GameWithDifficulty -username $script:currAccount -difficulty $difficultyData.Name }
-                2 { return }
-                default { Write-Host "Invalid option. Please select a valid option." }
+            while($true) {
+                $choice = Read-Host "Do you want to restart?`n[1] Restart with same difficulty`n[2] Back to main menu"
+                switch ($choice) {
+                    1 { Start-GameWithDifficulty -username $script:currAccount -difficulty $difficultyData.Name }
+                    2 { return }
+                    default { break; Write-Host "Invalid option. Please select a valid option." }
+                }
             }
         }
     }
